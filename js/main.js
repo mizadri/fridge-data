@@ -1,10 +1,10 @@
 $(function(){
-var url_categoria = "https://es.wikibooks.org/wiki/Categoría:";
+var url_receta = "https://es.wikibooks.org/wiki/Artes_culinarias/Recetas/";
 var url_ingrediente = "https://es.wikibooks.org/wiki/Ingrediente:";
-var url_categorias = "https://es.wikibooks.org/wiki/Categoría:Ingredientes"
+var url_recetas = "https://es.wikibooks.org/wiki/Categoría:Recetas"
 
-var categorias_links = [];
-var categorias = [];
+var recetas_links = [];
+var recetas = [];
 
 
 $( "#limpiar" ).click(function() {
@@ -13,65 +13,70 @@ $( "#limpiar" ).click(function() {
 
 $( "#recetas" ).click(function() {
     $('#data').html("<img src='img/pizza-loading.gif'/>")
-    //Obtener categorias
+    //Obtener recetas
 
     $.ajax({
-        url: url_categorias,
+        url: url_recetas,
         type: "get",
         dataType: "html",
         success: function (data) {
-            var categoria;
-            var a_list = $('a.CategoryTreeLabel.CategoryTreeLabelNs14.CategoryTreeLabelCategory',data.responseText);
+            var receta;
+            var a_list = $('.mw-category a',data.responseText).get();
 
-            for(var i = 0; i < a_list.length; i++){
+            for(var i = 1; i < a_list.length; i++){
 
-                categoria = a_list[i].innerHTML;
-                if( categoria != undefined && categoria.length >1){
+                receta = a_list[i].innerHTML.split('/')[2];
+                if( receta != undefined && receta.length >1){
 
-                    categorias.push(categoria);
-                    categoria = categoria.replace(/\s+/g, "_");
-                    categorias_links.push(categoria);
+                    recetas.push(receta);
+                    receta = receta.replace(/\s+/g, "_");
+                    recetas_links.push(receta);
 
                 }
                 
 
             }
-                categoriasObtained();
+                recetasObtained();
         }
     });
 });
 
-//Obtener ingredientes de una categoria
+//Obtener ingredientes de una receta
 //Necesitas haber recibido la respuesta(success) antes de usar resultados que ella obtiene
-function categoriasObtained(){
-   console.log(categorias);
-   console.log(categorias_links);
-   for (var i = 1; i < categorias.length; i++) {
-       
-       $.ajax({
-            url: url_categoria+categorias_links[i],
+function recetasObtained(){
+    $('#data').html("");
+
+    for (var i = 0; i < recetas.length; i++) {   
+        $.ajax({
+            url: url_receta+recetas_links[i],
             type: "get",
+            receta: recetas[i],
             dataType: "html",
             success: function (data) {
-                var result = "<br>Categoria: " + categorias[i] +"'<br>";
-                var a_list = $('.mw-content-ltr ul li a',data.responseText).get();
-                var ingrediente;
+                
+                var result = "<br>Receta: " + this.receta +"<br> Ingredientes:<br>";
+                var a_list = $('#mw-content-text > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) li',data.responseText).get();
+                var texto_ingredientes = [];
 
-                for (var i = 0; i < a_list.length; i++) {
-                    ingrediente = a_list[i].title.split('/')[2];
-                    if (ingrediente != undefined && ingrediente.length > 1)
-                        result += "'"+ ingrediente +"'</br>";
+                console.log(a_list);
+                for (var j = 0; j < a_list.length; j++) {
+                    texto_ingredientes.push(a_list[j].textContent);
+                    result += a_list[j].textContent+"<br>";
                 }
+
                 $('#data').append(result);
             }
         });
-   }
+
+       
+        
+    }
 }
 
 $( "#ingredientes" ).click(function() {
     $('#data').html("<img src='img/pizza-loading.gif'/>")
   $.ajax({
-        url: url_categorias,
+        url: url_recetas,
         type: "get",
         dataType: "html",
         success: function (data) {
