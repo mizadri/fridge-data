@@ -55,20 +55,21 @@ function recetasObtained(){
             success: function (data) {
                 
                 var result = "<br>Receta: " + this.receta +"<br> Ingredientes:<br>";
-                var a_list = $('#mw-content-text > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) li',data.responseText).get();
+                var html_ingreds = $('#mw-content-text > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) li',data.responseText).get();
+                var html_refs = $('.mw-content-ltr ul li a',data.responseText).get();
                 var texto_ingredientes = [];
 
-                console.log(a_list);
-                for (var j = 0; j < a_list.length; j++) {
-                    texto_ingredientes.push(a_list[j].textContent);
-                    result += a_list[j].textContent+"<br>";
+                console.log(html_ingreds);
+                for (var j = 0; j < html_ingreds.length; j++) {
+                    texto_ingredientes.push(html_ingreds[j].textContent);
+                    result += html_ingreds[j].textContent+"<br>";
                 }
 
                 $('#data').append(result);
             }
         });
 
-       
+       html_refs
         
     }
 }
@@ -82,9 +83,9 @@ $( "#ingredientes" ).click(function() {
         success: function (data) {
             var ingrediente;
             var result = "";
-            var a_list = $('.mw-content-ltr ul li a',data.responseText).get();
-            for (var i = 0; i < a_list.length; i++) {
-                ingrediente = a_list[i].title.split('/')[2];
+            var html_refs = $('.mw-content-ltr ul li a',data.responseText).get();
+            for (var i = 0; i < html_refs.length; i++) {
+                ingrediente = html_refs[i].title.split('/')[2];
 
                 if (ingrediente != undefined && ingrediente.length > 1)
                     result += "'"+ingrediente+"'<br>";
