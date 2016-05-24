@@ -45,7 +45,6 @@ $( "#recetas" ).click(function() {
 //Necesitas haber recibido la respuesta(success) antes de usar resultados que ella obtiene
 function recetasObtained(){
     $('#data').html("");
-
     for (var i = 0; i < recetas.length; i++) {   
         $.ajax({
             url: url_receta+recetas_links[i],
@@ -58,6 +57,7 @@ function recetasObtained(){
                 var html_ingreds = $('#mw-content-text > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) li',data.responseText).get();
                 var html_refs = $('.mw-content-ltr ul li a',data.responseText).get();
                 var texto_ingredientes = [];
+                var ingredientes = [];
 
                 console.log(html_ingreds);
                 for (var j = 0; j < html_ingreds.length; j++) {
@@ -65,11 +65,20 @@ function recetasObtained(){
                     result += html_ingreds[j].textContent+"<br>";
                 }
 
+                for (var i = 0; i < html_refs.length; i++) {
+                    ingredientes.push(html_refs[i]);
+                }
+
+                
+                if(html_refs.length != html_ingreds.length){
+                    result += "--diferentes<br>";
+                }
+
                 $('#data').append(result);
             }
         });
 
-       html_refs
+       
         
     }
 }
