@@ -54,33 +54,23 @@ function recetasObtained(){
             success: function (data) {
                 
                 var result = "<br>Receta: " + this.receta +"<br>";
-                var html_ingreds = $('#mw-content-text > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1) > td:nth-child(1) > div:nth-child(1) li',data.responseText).get();
-                var html_refs = $('.mw-content-ltr ul li a',data.responseText).get();
+                var tiempo = $('td[align="center"]',data.responseText)[2].textContent.split("\n")[1];
+                var personas = $('td[align="center"] b', data.responseText)[0].textContent;
+                var dificultad = $('td[align="left"] a.image img[src$=".svg.png"]', data.responseText)[0].alt;
+                var html_ingreds = $("td[width='35%'] li",data.responseText).get();
+                var html_refs = $("td[width='35%'] li a",data.responseText).get();
                 var texto_ingredientes = [];
                 var ingredientes = [];
-                var personas = $('b', data.responseText)[0].textContent;
-                var npersonas = parseInt(personas.split(' ')[0]);
-                var dificultad = $('.image img', data.responseText).get()[2].alt;
-                result += "Dificultad: "+dificultad+"<br>"+ personas + "<br>Ingredientes:<br>";
+                
+                result += "Dificultad: "+dificultad+"<br>Tiempo: "+tiempo+"<br>"+ personas + "<br>Ingredientes:<br>";
 
                 for (var k = 0; k < html_refs.length; k++) {
-                    ingredientes.push(html_refs[k].title.split('/')[2]);
+                    ingredientes.push(html_refs[k].textContent);
                 }
 
                 for (var j = 0; j < html_ingreds.length; j++) {
                     texto_ingredientes.push(html_ingreds[j].textContent);
-                    if(ingredientes[j]==undefined 
-                        || texto_ingredientes[j].toLowerCase().indexOf(ingredientes[j].toLowerCase())<0){
-                        result += "FALTA REF ";
-                    }
                     result += html_ingreds[j].textContent+"<br>";
-                }
-
-                
-
-                
-                if(html_refs.length != html_ingreds.length){
-                    result += "--faltan referencias a ingredientes<br>";
                 }
 
                 $('#data').append(result);
