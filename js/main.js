@@ -1,7 +1,8 @@
 $(function(){
 var url_receta = "https://es.wikibooks.org/wiki/Artes_culinarias/Recetas/";
 var url_ingrediente = "https://es.wikibooks.org/wiki/Ingrediente:";
-var url_recetas = "https://es.wikibooks.org/wiki/Categoría:Recetas"
+var url_recetas = "https://es.wikibooks.org/wiki/Categoría:Recetas";
+var url_ingredientes = "https://es.wikibooks.org/wiki/Categor%C3%ADa:Ingredientes";
 
 var recetas_links = [];
 var recetas = [];
@@ -12,7 +13,7 @@ $( "#limpiar" ).click(function() {
 });
 
 $( "#recetas" ).click(function() {
-    $('#data').html("<img src='img/pizza-loading.gif'/>")
+    $('#data').html("<img id='pizza' src='img/pizza-loading.gif'/>")
     //Obtener recetas
 
     $.ajax({
@@ -44,12 +45,13 @@ $( "#recetas" ).click(function() {
 //Obtener ingredientes de una receta
 //Necesitas haber recibido la respuesta(success) antes de usar resultados que ella obtiene
 function recetasObtained(){
-    $('#data').html("");
+    $('#pizza').remove();
     for (var i = 0; i < recetas.length; i++) {   
         $.ajax({
             url: url_receta+recetas_links[i],
             type: "get",
             receta: recetas[i],
+            indice: i,
             dataType: "html",
             success: function (data) {
                 
@@ -62,6 +64,10 @@ function recetasObtained(){
                 var texto_ingredientes = [];
                 var ingredientes = [];
                 
+                if(this.indice == 0){
+                    console.log($('td[align="center"]'));
+                }
+
                 result += "Dificultad: "+dificultad+"<br>Tiempo: "+tiempo+"<br>"+ personas + "<br>Ingredientes:<br>";
 
                 for (var k = 0; k < html_refs.length; k++) {
@@ -85,7 +91,7 @@ function recetasObtained(){
 $( "#ingredientes" ).click(function() {
     $('#data').html("<img src='img/pizza-loading.gif'/>")
   $.ajax({
-        url: url_recetas,
+        url: url_ingredientes,
         type: "get",
         dataType: "html",
         success: function (data) {
