@@ -56,24 +56,30 @@ function recetasObtained(){
             success: function (data) {
                 
                 var result = "<br>Receta: " + this.receta +"<br>";
-                var tiempo = $('td[align="center"]',data.responseText)[3].textContent.split("\n")[1];
-                if (typeof tiempo[3] == 'undefined'){
-                    console.log("Undef");
-                    console.log($('td[align="center"]',data.responseText));
-                    tiempo = $('td[align="center"]',data.responseText)[2].textContent.split("\n")[1];
+                var tiempo= "";
+                var td_tiempo = $('td[align="center"]',data.responseText);
+                if (typeof td_tiempo[3] != 'undefined'){
+                  //  console.log("def 3");
+                    tiempo = td_tiempo[3].textContent.split("\n")[1];
+                }else if(typeof td_tiempo[2] != 'undefined'){
+                    console.log("def 2");
+                    tiempo = td_tiempo[2].textContent.split("\n")[1];
+                }else {
+                    console.log(data.textContent);
                 }
 
                 var personas = $('td[align="center"] b', data.responseText)[0].textContent;
+                /*if(personas = undefined)
+                    console.log($('td[align="center"] b',data.responseText));
+                */
                 var dificultad = $('td[align="left"] a.image img[src$=".svg.png"]', data.responseText)[0].alt;
-                var html_ingreds = $("td[width='35%'] li",data.responseText).get();
-                var html_refs = $("td[width='35%'] li a",data.responseText).get();
+                var html_ingreds = $("td[width='35%'] li",data.responseText);
+                var html_refs = $("td[width='35%'] li a",data.responseText);
                 var texto_ingredientes = [];
                 var ingredientes = [];
-                
-              /*  if(this.indice == 0){
-                    console.log($('td[align="center"]',data.responseText));
-                }*/
-
+                var html_pasos = $("td div ol li",data.responseText);
+                var pasos[];
+            
                 result += "Dificultad: "+dificultad+"<br>Tiempo: "+tiempo+"<br>"+ personas + "<br>Ingredientes:<br>";
 
                 for (var k = 0; k < html_refs.length; k++) {
@@ -83,6 +89,11 @@ function recetasObtained(){
                 for (var j = 0; j < html_ingreds.length; j++) {
                     texto_ingredientes.push(html_ingreds[j].textContent);
                     result += html_ingreds[j].textContent+"<br>";
+                }
+
+                for (var z = 0; z < html_pasos.length; z++) {
+                    pasos.push(html_pasos[z].textContent);
+                    result += "Pasos: <br>"+html_pasos[z].textContent+"<br>";
                 }
 
                 $('#data').append(result);
