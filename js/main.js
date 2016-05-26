@@ -56,7 +56,13 @@ function recetasObtained(){
             success: function (data) {
                 
                 var result = "<br>Receta: " + this.receta +"<br>";
-                var tiempo = $('td[align="center"]',data.responseText)[2].textContent.split("\n")[1];
+                var tiempo = $('td[align="center"]',data.responseText)[3].textContent.split("\n")[1];
+                if (typeof tiempo[3] == 'undefined'){
+                    console.log("Undef");
+                    console.log($('td[align="center"]',data.responseText));
+                    tiempo = $('td[align="center"]',data.responseText)[2].textContent.split("\n")[1];
+                }
+
                 var personas = $('td[align="center"] b', data.responseText)[0].textContent;
                 var dificultad = $('td[align="left"] a.image img[src$=".svg.png"]', data.responseText)[0].alt;
                 var html_ingreds = $("td[width='35%'] li",data.responseText).get();
@@ -64,9 +70,9 @@ function recetasObtained(){
                 var texto_ingredientes = [];
                 var ingredientes = [];
                 
-                if(this.indice == 0){
-                    console.log($('td[align="center"]'));
-                }
+              /*  if(this.indice == 0){
+                    console.log($('td[align="center"]',data.responseText));
+                }*/
 
                 result += "Dificultad: "+dificultad+"<br>Tiempo: "+tiempo+"<br>"+ personas + "<br>Ingredientes:<br>";
 
