@@ -64,9 +64,9 @@ function recetasObtained(){
                 }else if(typeof td_tiempo[2] != 'undefined'){
                     console.log("def 2");
                     tiempo = td_tiempo[2].textContent.split("\n")[1];
-                }else {
-                    console.log(data.textContent);
-                }
+                }else //Hay páginas que no siguen el formato de dar Ingredientes y Pasos. Las ignoraremos.
+                    return;
+                
 
                 var personas = $('td[align="center"] b', data.responseText)[0].textContent;
                 /*if(personas = undefined)
@@ -78,7 +78,7 @@ function recetasObtained(){
                 var texto_ingredientes = [];
                 var ingredientes = [];
                 var html_pasos = $("td div ol li",data.responseText);
-                var pasos[];
+                var pasos = [];
             
                 result += "Dificultad: "+dificultad+"<br>Tiempo: "+tiempo+"<br>"+ personas + "<br>Ingredientes:<br>";
 
@@ -91,9 +91,11 @@ function recetasObtained(){
                     result += html_ingreds[j].textContent+"<br>";
                 }
 
+                result += "Pasos: <br>";
+
                 for (var z = 0; z < html_pasos.length; z++) {
                     pasos.push(html_pasos[z].textContent);
-                    result += "Pasos: <br>"+html_pasos[z].textContent+"<br>";
+                    result += html_pasos[z].textContent+"<br>";
                 }
 
                 $('#data').append(result);
