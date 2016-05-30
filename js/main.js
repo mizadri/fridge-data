@@ -5,16 +5,18 @@ var url_recetas = "https://es.wikibooks.org/wiki/Categoría:Recetas";
 var url_ingredientes = "https://es.wikibooks.org/wiki/Categor%C3%ADa:Ingredientes";
 var urls_recetas = [];
 var letras_recetas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-
+var ingredientes = [];
 var m_recetas = [];
 var m_recetas_links = [];
+
+cargarIngredientes(); //carga una colección con el id de cada ingrediente de la BD para luego enlazar con recetas
 
 $( "#limpiar" ).click(function() {
     $('#data').html("");
 });
 
 $( "#recetas" ).click(function() {
-    
+    console.log(ingredientes);
     $('#data').html("<img id='pizza' src='img/pizza-loading.gif'/>")
 
     //Obtener recetas
@@ -111,25 +113,33 @@ function obtenerInformacionRecetas(indice){
     }
 }
 
-$( "#ingredientes" ).click(function() {
-    $('#data').html("<img src='img/pizza-loading.gif'/>")
-  $.ajax({
+function cargarIngredientes(){
+    $('#data').html("<img id='pizza' src='img/pizza-loading.gif'/>")
+    $.ajax({
         url: url_ingredientes,
         type: "get",
         dataType: "html",
         success: function (data) {
             var ingrediente;
-            var result = "";
             var html_refs = $('.mw-content-ltr ul li a',data.responseText).get();
-
+            var id = 0;
             for (var i = 0; i < html_refs.length; i++) {
                 ingrediente = html_refs[i].title.split('/')[2];
-                if (ingrediente != undefined && ingrediente.length > 1)
-                    result += "'"+ingrediente+"'<br>";
+                if (ingrediente != undefined && ingrediente.length > 1){
+                    ingredientes[ingrediente]=id;
+                    id++;
+                }
             }
-           $('#data').html(result);
+            $('#pizza').remove();
         }
     });
+}
+$( "#ingredientes" ).click(function() {
+    result = "";
+    for (var ingrediente in ingredientes) {
+        result += "'"+ingredientes[ingrediente]+"', '"+ingrediente+"'<br>";
+    }
+    $('#data').html(result);
 });
 
 
