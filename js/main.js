@@ -3,20 +3,59 @@ $(function(){
 var base_url_receta = "https://es.wikibooks.org/wiki/Artes_culinarias/Recetas/";
 var url_recetas = "https://es.wikibooks.org/wiki/Categoría:Recetas";
 var url_ingredientes = "https://es.wikibooks.org/wiki/Categor%C3%ADa:Ingredientes";
+var url_ingrediente = "https://es.wikibooks.org/wiki/Artes_culinarias/Ingredientes/";
 var urls_recetas = [];
 var letras_recetas = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'Ñ', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 var ingredientes = [];
+var map_ingr_cat = [];
 var m_recetas = [];
 var m_recetas_links = [];
+var recetas_query = "INSERT INTO 'recetas' VALUES('";
+var ingredientes_query = "INSERT INTO 'ingredientes' (nombre, categoria)VALUES('";
 
 cargarIngredientes(); //carga una colección con el id de cada ingrediente de la BD para luego enlazar con recetas
+
+function imprimirCategorias(){
+    var queries = "";
+    console.log(map_ingr_cat["Aceite"]);
+
+    for (var i = 0; i < ingredientes.length; i++) {
+        if(ingredientes[i]!= undefined)
+            queries += ingredientes_query + ingredientes[i] + "','"+ map_ingr_cat[ingredientes[i]] + "');<br>";
+    }
+
+    $('#data').html(queries);
+}
+
+function getCategorias(){
+    
+    for (var i = 0; i < ingredientes.length; i++) {
+        if(ingredientes[i] != undefined){
+            var link = ingredientes[i].replace(/\s+/g, "_");        
+            $.ajax({
+                url: url_ingrediente + link,
+                type: "get",
+                dataType: "html",
+                ingrediente: ingredientes[i],
+                success: function (data) {                
+                    map_ingr_cat[this.ingrediente] = $('#mw-normal-catlinks ul li:last-child', data.responseText)[0].textContent;
+                    if(this.ingrediente == "Ñora")
+                       imprimirCategorias();
+
+                }
+            });
+        }
+        
+    }
+}
+
+
 
 $( "#limpiar" ).click(function() {
     $('#data').html("");
 });
 
 $( "#recetas" ).click(function() {
-    console.log(ingredientes);
     $('#data').html("<img id='pizza' src='img/pizza-loading.gif'/>")
 
     //Obtener recetas
@@ -86,16 +125,15 @@ function obtenerInformacionRecetas(indice){
                     var html_ingreds = $("td[width='35%'] li",data.responseText);
                     var html_refs = $("td[width='35%'] li a",data.responseText);
                     var texto_ingredientes = [];
-                    var ingredientes = [];
+                    var refs_ingredientes = [];
                     var html_pasos = $("td div ol li",data.responseText);
                     var pasos = [];
                 
                     result += "Dificultad: "+dificultad+"<br>Tiempo: "+tiempo+"<br>"+ personas + "<br>Ingredientes:<br>";
 
                     for (var k = 0; k < html_refs.length; k++) {
-                        ingredientes.push(html_refs[k].textContent);
+                        refs_ingredientes.push(html_refs[k].textContent);
                     }
-
                     for (var j = 0; j < html_ingreds.length; j++) {
                         texto_ingredientes.push(html_ingreds[j].textContent);
                         result += html_ingreds[j].textContent+"<br>";
@@ -122,22 +160,21 @@ function cargarIngredientes(){
         success: function (data) {
             var ingrediente;
             var html_refs = $('.mw-content-ltr ul li a',data.responseText).get();
-            var id = 0;
+
             for (var i = 0; i < html_refs.length; i++) {
                 ingrediente = html_refs[i].title.split('/')[2];
                 if (ingrediente != undefined && ingrediente.length > 1){
-                    ingredientes[ingrediente]=id;
-                    id++;
+                    ingredientes[i]=ingrediente;
                 }
             }
-            $('#pizza').remove();
+            getCategorias();            
         }
     });
 }
 $( "#ingredientes" ).click(function() {
     result = "";
     for (var ingrediente in ingredientes) {
-        result += "'"+ingredientes[ingrediente]+"', '"+ingrediente+"'<br>";
+        result += ingredientes[ingrediente]+"<br>";
     }
     $('#data').html(result);
 });
