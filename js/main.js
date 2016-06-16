@@ -10,7 +10,9 @@ var ingredientes = [];
 var map_ingr_cat = [];
 var m_recetas = [];
 var m_recetas_links = [];
-var recetas_query = "INSERT INTO 'recetas' VALUES('";
+var recetas_query = "INSERT INTO 'recetas' (nombre, dificultad, duracion, personas)VALUES('";
+var rec_pasos_query = "INSERT INTO 'recetas_pasos' (id_receta, paso, descripcion)VALUES('";
+var rec_ingr_query = "INSERT INTO 'recetas_ingredientes' (id_receta, id_ingrediente, descripcion)VALUES('";
 var ingredientes_query = "INSERT INTO 'ingredientes' (nombre, categoria)VALUES('";
 
 cargarIngredientes(); //carga una colección con el id de cada ingrediente de la BD para luego enlazar con recetas
