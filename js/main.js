@@ -1,4 +1,8 @@
 $(function(){
+//Este script sirve para acceder a una wiki que contiene informacion de recetas/ingredientes
+//Se utiliza una extension de jQuery basado en Yahoo Query Language que permite hacer peticiones AJAX Cross-Origin(generalmente bloqueadas por los servidores)
+//Primero se descargan todos los ingredientes y se crean sus Queries de inserción en la BD sqlite para una aplicacion Android.
+//Despues se descargan todas las recetas y se construyen por una parte las Queries que las insertan y por otra las que las relacionan con los ingredientes.
 
 var base_url_receta = "https://es.wikibooks.org/wiki/Artes_culinarias/Recetas/";
 var url_recetas = "https://es.wikibooks.org/wiki/Categoría:Recetas";
@@ -16,10 +20,10 @@ var rec_ingr_query = "INSERT INTO 'receta_ingredientes' (id_receta, id_ingredien
 var ingredientes_query = "INSERT INTO 'ingredientes' (_id, nombre, categoria)VALUES('";
 var map_ingr_index = [];
 var _id_rec = 0;
-//carga una colección con el id de cada ingrediente de la BD para luego enlazar con recetas
+//Carga una colección con el id de cada ingrediente de la BD para luego enlazar con recetas
 cargarIngredientes(); 
 
-//imprime las queries de ingredientes con sus respectivas categorias
+//Imprime las queries de ingredientes con sus respectivas categorias
 function imprimirCategorias(){
     var queries = "";
     console.log(map_ingr_cat["Aceite"]);
@@ -32,7 +36,7 @@ function imprimirCategorias(){
     $('#data').html(queries);
 }
 
-//Se obteienn las categorias de cada ingredientes y se guardan en una coleccion cuya clave es el ingrediente
+//Obtiene las categorias de cada ingredientes y se guardan en una coleccion cuya clave es el ingrediente
 function getCategorias(){
     
     for (var i = 0; i < ingredientes.length; i++) {
@@ -96,9 +100,13 @@ $( "#recetas" ).click(function() {
     }
 });
 
-
-//Obtener ingredientes de una receta
-//Necesitas haber recibido la respuesta(success) antes de usar resultados que ella obtiene
+//Obtiene ingredientes de una receta. Crea las queries necesarias para almacenar toda la receta. En 3 tablas:
+//
+// recetas: Guarda los campos con un unico valor que tiene una receta (dificultad, duracion, personas)
+// receta_pasos: Almacena todos los pasos de una receta.
+// receta_ingredientes: Almacena todos los ingredientes necesarios. 
+//  Pueden no estar relacionados con los existentes en la BD, se guarda con id_ingrediente a NULL.
+//  Se guarda por separado en esta misma tabla los enlaces a ingredientes con la descripcion a NULL.
 function obtenerInformacionRecetas(indice){
     if(indice == 0){
         $('#pizza').remove();
@@ -123,12 +131,9 @@ function obtenerInformacionRecetas(indice){
                         tiempo = td_tiempo[3].textContent.split("\n")[1];
                     }else if(typeof td_tiempo[2] != 'undefined'){
                         tiempo = td_tiempo[2].textContent.split("\n")[1];
-                    }/*else //Hay páginas que no siguen el formato de dar Ingredientes y Pasos. Las ignoraremos.
-                        return;*/
+                    }
 
                     var personas = $('td[align="center"] b', data.responseText)[0].textContent;
-                    /*if($('td[align="left"] a.image img[src$=".svg.png"]', data.responseText)[0] == undefined)
-                        return;*/
                     var dificultad = $('td[align="left"] a.image img[src$=".svg.png"]', data.responseText)[0].alt;
                     var html_ingreds = $("td[width='35%'] li",data.responseText);
                     var html_refs = $("td[width='35%'] li a",data.responseText);
@@ -140,17 +145,13 @@ function obtenerInformacionRecetas(indice){
                     query_receta += recetas_query + _id_rec + "','" + this.receta+ "','" + dificultad + "','"+ tiempo + "','"+ personas + "');<br>";
 
                     for (var k = 0; k < html_refs.length; k++) {
-                        //refs_ingredientes.push(html_refs[k].textContent);
                         queries_ingredientes += rec_ingr_query + _id_rec + "','" + map_ingr_index[html_refs[k].textContent]+"'," + "NULL" + ");<br>";
                     }
                     for (var j = 0; j < html_ingreds.length; j++) {
-                        //texto_ingredientes.push(html_ingreds[j].textContent);
                         queries_ingredientes += rec_ingr_query + _id_rec + "'," + "NULL" + ",'" + html_ingreds[j].textContent +  "');<br>";
                     }
 
                     for (var z = 0; z < html_pasos.length; z++) {
-                        //pasos.push(html_pasos[z].textContent);
-                        //result += html_pasos[z].textContent+"<br>";
                         queries_pasos += rec_pasos_query + _id_rec + "','" + z +"','" + html_pasos[z].textContent + "');<br>";
                     }
 
@@ -182,7 +183,7 @@ function cargarIngredientes(){
                     ingredientes[index]=ingrediente;
                     map_ingr_index[ingrediente]=index;
                     index++;
-                    
+
                 }
             }
             getCategorias();            
