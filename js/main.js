@@ -16,8 +16,10 @@ var rec_ingr_query = "INSERT INTO 'receta_ingredientes' (id_receta, id_ingredien
 var ingredientes_query = "INSERT INTO 'ingredientes' (_id, nombre, categoria)VALUES('";
 var map_ingr_index = [];
 var _id_rec = 0;
-cargarIngredientes(); //carga una colección con el id de cada ingrediente de la BD para luego enlazar con recetas
+//carga una colección con el id de cada ingrediente de la BD para luego enlazar con recetas
+cargarIngredientes(); 
 
+//imprime las queries de ingredientes con sus respectivas categorias
 function imprimirCategorias(){
     var queries = "";
     console.log(map_ingr_cat["Aceite"]);
@@ -30,6 +32,7 @@ function imprimirCategorias(){
     $('#data').html(queries);
 }
 
+//Se obteienn las categorias de cada ingredientes y se guardan en una coleccion cuya clave es el ingrediente
 function getCategorias(){
     
     for (var i = 0; i < ingredientes.length; i++) {
@@ -175,15 +178,18 @@ function cargarIngredientes(){
             for (var i = 0; i < html_refs.length; i++) {
                 ingrediente = html_refs[i].title.split('/')[2];
                 if (ingrediente != undefined && ingrediente.length > 1){
+
                     ingredientes[index]=ingrediente;
                     map_ingr_index[ingrediente]=index;
                     index++;
+                    
                 }
             }
             getCategorias();            
         }
     });
 }
+
 $( "#ingredientes" ).click(function() {
     result = "";
     for (var ingrediente in ingredientes) {
@@ -191,6 +197,5 @@ $( "#ingredientes" ).click(function() {
     }
     $('#data').html(result);
 });
-
 
 })
