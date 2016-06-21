@@ -10,11 +10,12 @@ var ingredientes = [];
 var map_ingr_cat = [];
 var m_recetas = [];
 var m_recetas_links = [];
-var recetas_query = "INSERT INTO 'recetas' (nombre, dificultad, duracion, personas)VALUES('";
-var rec_pasos_query = "INSERT INTO 'recetas_pasos' (id_receta, paso, descripcion)VALUES('";
-var rec_ingr_query = "INSERT INTO 'recetas_ingredientes' (id_receta, id_ingrediente, descripcion)VALUES('";
-var ingredientes_query = "INSERT INTO 'ingredientes' (nombre, categoria)VALUES('";
-
+var recetas_query = "INSERT INTO 'recetas' (_id, nombre, dificultad, duracion, personas)VALUES('";
+var rec_pasos_query = "INSERT INTO 'receta_pasos' (id_receta, paso, descripcion)VALUES('";
+var rec_ingr_query = "INSERT INTO 'receta_ingredientes' (id_receta, id_ingrediente, descripcion)VALUES('";
+var ingredientes_query = "INSERT INTO 'ingredientes' (_id, nombre, categoria)VALUES('";
+var map_ingr_index = [];
+var _id_rec = 0;
 cargarIngredientes(); //carga una colección con el id de cada ingrediente de la BD para luego enlazar con recetas
 
 function imprimirCategorias(){
@@ -23,7 +24,7 @@ function imprimirCategorias(){
 
     for (var i = 0; i < ingredientes.length; i++) {
         if(ingredientes[i]!= undefined)
-            queries += ingredientes_query + ingredientes[i] + "','"+ map_ingr_cat[ingredientes[i]] + "');<br>";
+            queries += ingredientes_query + map_ingr_index[ingredientes[i]] + "','"+ ingredientes[i] + "','"+ map_ingr_cat[ingredientes[i]] + "');<br>";
     }
 
     $('#data').html(queries);
@@ -109,7 +110,9 @@ function obtenerInformacionRecetas(indice){
                 dataType: "html",
                 success: function (data) {
                     
-                    var result = "<br>Receta: " + this.receta +"<br>";
+                    var query_receta = "";
+                    var queries_pasos = "";
+                    var queries_ingredientes = "";
                     var tiempo= "";
                     var td_tiempo = $('td[align="center"]',data.responseText);
 
@@ -129,24 +132,29 @@ function obtenerInformacionRecetas(indice){
                     var texto_ingredientes = [];
                     var refs_ingredientes = [];
                     var html_pasos = $("td div ol li",data.responseText);
-                    var pasos = [];
-                
-                    result += "Dificultad: "+dificultad+"<br>Tiempo: "+tiempo+"<br>"+ personas + "<br>Ingredientes:<br>";
+                    var pasos = []; 
+                    
+                    query_receta += recetas_query + _id_rec + "','" + this.receta+ "','" + dificultad + "','"+ tiempo + "','"+ personas + "');<br>";
 
                     for (var k = 0; k < html_refs.length; k++) {
-                        refs_ingredientes.push(html_refs[k].textContent);
+                        //refs_ingredientes.push(html_refs[k].textContent);
+                        queries_ingredientes += rec_ingr_query + _id_rec + "','" + map_ingr_index[html_refs[k].textContent]+"'," + "NULL" + ");<br>";
                     }
                     for (var j = 0; j < html_ingreds.length; j++) {
-                        texto_ingredientes.push(html_ingreds[j].textContent);
-                        result += html_ingreds[j].textContent+"<br>";
+                        //texto_ingredientes.push(html_ingreds[j].textContent);
+                        queries_ingredientes += rec_ingr_query + _id_rec + "'," + "NULL" + ",'" + html_ingreds[j].textContent +  "');<br>";
                     }
-                    result += "Pasos: <br>";
 
                     for (var z = 0; z < html_pasos.length; z++) {
-                        pasos.push(html_pasos[z].textContent);
-                        result += html_pasos[z].textContent+"<br>";
+                        //pasos.push(html_pasos[z].textContent);
+                        //result += html_pasos[z].textContent+"<br>";
+                        queries_pasos += rec_pasos_query + _id_rec + "','" + z +"','" + html_pasos[z].textContent + "');<br>";
                     }
-                    $('#data').append(result);
+
+                    $('#queries-recetas').append(query_receta);
+                    $('#queries-pasos').append(queries_pasos);
+                    $('#queries-ingredientes').append(queries_ingredientes);
+                    _id_rec++;
                 }
             });       
         }
@@ -162,11 +170,14 @@ function cargarIngredientes(){
         success: function (data) {
             var ingrediente;
             var html_refs = $('.mw-content-ltr ul li a',data.responseText).get();
+            var index = 0;
 
             for (var i = 0; i < html_refs.length; i++) {
                 ingrediente = html_refs[i].title.split('/')[2];
                 if (ingrediente != undefined && ingrediente.length > 1){
-                    ingredientes[i]=ingrediente;
+                    ingredientes[index]=ingrediente;
+                    map_ingr_index[ingrediente]=index;
+                    index++;
                 }
             }
             getCategorias();            
