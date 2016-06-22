@@ -63,6 +63,9 @@ function getCategorias(){
 
 $( "#limpiar" ).click(function() {
     $('#data').html("");
+    $('#queries-recetas').html("");
+    $('#queries-pasos').(html("");
+    $('#queries-ingredientes').html("");
 });
 
 $( "#recetas" ).click(function() {
@@ -145,7 +148,9 @@ function obtenerInformacionRecetas(indice){
                     query_receta += recetas_query + _id_rec + "','" + this.receta+ "','" + dificultad + "','"+ tiempo + "','"+ personas + "');<br>";
 
                     for (var k = 0; k < html_refs.length; k++) {
-                        queries_ingredientes += rec_ingr_query + _id_rec + "','" + map_ingr_index[html_refs[k].textContent]+"'," + "NULL" + ");<br>";
+                        var ing_ref = map_ingr_index[html_refs[k].textContent];
+                        if(ing_ref != undefined)
+                            queries_ingredientes += rec_ingr_query + _id_rec + "','" + ing_ref +"'," + "NULL" + ");<br>";
                     }
                     for (var j = 0; j < html_ingreds.length; j++) {
                         queries_ingredientes += rec_ingr_query + _id_rec + "'," + "NULL" + ",'" + html_ingreds[j].textContent +  "');<br>";
